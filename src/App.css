@@ -1,0 +1,98 @@
+#root {
+  width: 100%;
+}
+
+.app {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.panel {
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  box-sizing: border-box;
+}
+
+button {
+  border: 1px solid #1c1c1c;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  background: #1c1c1c;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.drop-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.drop-item {
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  padding: 0.85rem;
+}
+
+.drop-item h3 {
+  margin: 0;
+}
+
+.meta {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #b10000;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+  }
+}
