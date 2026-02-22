@@ -1,193 +1,73 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
 import './App.css'
-import { supabase } from './lib/supabase'
 
-type Drop = {
-  id: string
-  created_at: string
-  group_code: string
-  created_by: string
-  title: string
-  note: string | null
-  url: string | null
-}
+const steps = [
+  'Choose a difficulty',
+  'Reload until you like the challenge',
+  'Set your timer',
+  'Hit play and sketch fast',
+]
 
-type DropFormState = {
-  group_code: string
-  created_by: string
-  title: string
-  note: string
-  url: string
-}
-
-const initialForm: DropFormState = {
-  group_code: '',
-  created_by: '',
-  title: '',
-  note: '',
-  url: '',
-}
+const perks = [
+  'Sharper design thinking',
+  'Faster visual decisions',
+  'Stronger whiteboard confidence',
+  'Better interview storytelling',
+]
 
 function App() {
-  const [drops, setDrops] = useState<Drop[]>([])
-  const [filterGroupCode, setFilterGroupCode] = useState('')
-  const [form, setForm] = useState<DropFormState>(initialForm)
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const activeGroupFilter = useMemo(() => filterGroupCode.trim(), [filterGroupCode])
-
-  const loadDrops = async () => {
-    setLoading(true)
-    setError(null)
-
-    let query = supabase
-      .from('drops')
-      .select('id, created_at, group_code, created_by, title, note, url')
-      .order('created_at', { ascending: false })
-      .limit(100)
-
-    if (activeGroupFilter) {
-      query = query.eq('group_code', activeGroupFilter)
-    }
-
-    const { data, error: fetchError } = await query
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setDrops([])
-      setLoading(false)
-      return
-    }
-
-    setDrops(data ?? [])
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    void loadDrops()
-  }, [activeGroupFilter])
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const payload = {
-      group_code: form.group_code.trim(),
-      created_by: form.created_by.trim(),
-      title: form.title.trim(),
-      note: form.note.trim() || null,
-      url: form.url.trim() || null,
-    }
-
-    if (!payload.group_code || !payload.created_by || !payload.title) {
-      setError('group_code, created_by, and title are required.')
-      return
-    }
-
-    setSubmitting(true)
-    setError(null)
-
-    const { error: insertError } = await supabase.from('drops').insert(payload)
-
-    if (insertError) {
-      setError(insertError.message)
-      setSubmitting(false)
-      return
-    }
-
-    setForm((current) => ({ ...initialForm, group_code: current.group_code }))
-    setFilterGroupCode(payload.group_code)
-    await loadDrops()
-    setSubmitting(false)
-  }
-
   return (
-    <main className="app">
-      <header>
-        <h1>Culture Piggybank</h1>
-        <p>Share links and notes with your group.</p>
-      </header>
+    <main className="page">
+      <section className="phone-shell">
+        <p className="eyebrow">DESIGNERCIZE-STYLE</p>
+        <h1>Designer, challenge thyself.</h1>
+        <p className="lede">
+          A random prompt generator for quick whiteboard reps. Built for an iPhone-sized flow.
+        </p>
 
-      <section className="panel">
-        <h2>Group Feed Filter</h2>
-        <div className="row">
-          <input
-            value={filterGroupCode}
-            onChange={(event) => setFilterGroupCode(event.target.value)}
-            placeholder="Enter group code to filter"
-            aria-label="Group code filter"
-          />
-          <button type="button" onClick={() => void loadDrops()} disabled={loading}>
-            Refresh
+        <div className="card">
+          <h2>How it works</h2>
+          <ol>
+            {steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="card controls">
+          <h2>Start a round</h2>
+          <div className="pill-row" aria-label="Difficulty options">
+            <button type="button">Easy</button>
+            <button type="button">Medium</button>
+            <button type="button">Hard</button>
+          </div>
+          <div className="timer">15:00</div>
+          <button type="button" className="primary">
+            Reload Challenge
           </button>
         </div>
-      </section>
 
-      <section className="panel">
-        <h2>New Drop</h2>
-        <form onSubmit={handleSubmit} className="form">
-          <input
-            required
-            value={form.group_code}
-            onChange={(event) => setForm((current) => ({ ...current, group_code: event.target.value }))}
-            placeholder="group_code"
-          />
-          <input
-            required
-            value={form.created_by}
-            onChange={(event) => setForm((current) => ({ ...current, created_by: event.target.value }))}
-            placeholder="created_by"
-          />
-          <input
-            required
-            value={form.title}
-            onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-            placeholder="title"
-          />
-          <textarea
-            value={form.note}
-            onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))}
-            placeholder="note"
-            rows={3}
-          />
-          <input
-            value={form.url}
-            onChange={(event) => setForm((current) => ({ ...current, url: event.target.value }))}
-            placeholder="url"
-            type="url"
-          />
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Save Drop'}
-          </button>
-        </form>
-      </section>
+        <div className="prompt card" role="status" aria-live="polite">
+          <p className="label">Design:</p>
+          <p className="value">A one-tap mood playlist starter</p>
+          <p className="label">For:</p>
+          <p className="value">Night-shift nurses</p>
+          <p className="label">To help:</p>
+          <p className="value">Reset stress in under 3 minutes</p>
+        </div>
 
-      <section className="panel">
-        <h2>Latest Drops</h2>
-        {loading ? <p>Loading drops...</p> : null}
-        {!loading && drops.length === 0 ? <p>No drops found.</p> : null}
-        {error ? <p className="error">{error}</p> : null}
+        <div className="card">
+          <h2>15 minutes a day gives you:</h2>
+          <ul>
+            {perks.map((perk) => (
+              <li key={perk}>{perk}</li>
+            ))}
+          </ul>
+        </div>
 
-        <ul className="drop-list">
-          {drops.map((drop) => (
-            <li key={drop.id} className="drop-item">
-              <h3>{drop.title}</h3>
-              <p className="meta">
-                group: {drop.group_code} | by: {drop.created_by} |{' '}
-                {new Date(drop.created_at).toLocaleString()}
-              </p>
-              {drop.note ? <p>{drop.note}</p> : null}
-              {drop.url ? (
-                <a href={drop.url} target="_blank" rel="noreferrer">
-                  {drop.url}
-                </a>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </section>
+        <a className="footer-link" href="#" onClick={(event) => event.preventDefault()}>
+          Get weekly prompt packs
+        </a>
+take      </section>
     </main>
   )
 }
